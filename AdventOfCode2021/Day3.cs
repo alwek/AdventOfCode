@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2021 {
     internal static class Day3 {
-        internal static void Run(string path) {
+        public static void Run(string path) {
             Console.WriteLine("Day 3");
             var input = FileHelper.ReadFileAsList(path);
             
