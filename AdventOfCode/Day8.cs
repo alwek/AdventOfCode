@@ -4,7 +4,6 @@ namespace AdventOfCode2021 {
             Console.WriteLine("Day 8");
             var input = FileHelper.ReadFileAsList(path);
 
-            Console.WriteLine("Part One and Two");
             Solve(input);
         }
 
@@ -45,8 +44,10 @@ namespace AdventOfCode2021 {
                 count += number.Count(x => x.Equals('1') || x.Equals('4') || x.Equals('7') || x.Equals('8'));
             }
 
-            Console.WriteLine($"Count is: {count}");
-            Console.WriteLine($"Sum is: {numbers.Sum()}");
+            Console.WriteLine("Part One");
+            Console.WriteLine($"Values 1, 4, 7 and 8 appears {count} times");
+            Console.WriteLine("Part Two");
+            Console.WriteLine($"The sum of all outputs are {numbers.Sum()}");
         }
     }
 }
