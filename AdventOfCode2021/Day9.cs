@@ -13,8 +13,8 @@ namespace AdventOfCode2021 {
                 .ToDictionary(x => (x.j, x.i), x => x.y - '0');
             forbidden = new() { (-1, 0), (0, 1), (0, -1), (1, 0) };
 
-            Console.WriteLine($"Part 1: {GetSumLowpoints()}");
-            Console.WriteLine($"Part 2: {GetLargestBasins()}");
+            Console.WriteLine($"Part One\nSum of lowpoints are {GetSumLowpoints()}");
+            Console.WriteLine($"Part Two\nProduct of three largest basins is {GetLargestBasins()}");
         }
 
         private static int GetSumLowpoints() => 
