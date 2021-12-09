@@ -1,4 +1,8 @@
 namespace AdventOfCode2021 {
+    /// <summary>
+    /// Contains solutions inspired by external sources.
+    /// Code found here is not to be credited to me.
+    /// </summary>
     internal static class Day9 {
         private static Dictionary<(int X, int Y), int> input;
         private static List<(int X, int Y)> forbidden;
