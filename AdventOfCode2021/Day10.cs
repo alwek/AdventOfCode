@@ -27,7 +27,6 @@ namespace AdventOfCode2021 {
                     else {
                         char openingBracket = brackets.Pop();
                         if (!bracketPairs[openingBracket].Equals(character)) {
-                            Console.WriteLine($"Expected {openingBracket}, but found {character} instead");
                             corruptPoints += CalculateCorruptPoints(character);
                             incomplete = false;
                         } 
