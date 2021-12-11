@@ -23,5 +23,21 @@
 
             return position;
         }
+        public static int[,] ReadFileAs2DIntArray(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int[,] position = new int[lines.Length, lines[0].Length];
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                int[] number = lines[i].Select(x => int.Parse(x.ToString())).ToArray(); ;
+                for (int j = 0; j < number.Length; j++)
+                {
+                    position[i, j] = number[j];
+                }
+            }
+
+            return position;
+        }
     }
 }
