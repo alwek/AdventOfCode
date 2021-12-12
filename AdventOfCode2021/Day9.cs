@@ -4,8 +4,8 @@ namespace AdventOfCode2021 {
     /// Code found here is not to be credited to me.
     /// </summary>
     internal static class Day9 {
-        private static Dictionary<(int X, int Y), int> input;
-        private static List<(int X, int Y)> forbidden;
+        private static Dictionary<(int X, int Y), int> input = new();
+        private static List<(int X, int Y)> forbidden = new();
 
         public static void Run(string path) {
             input = FileHelper.ReadFileAsList(path)
