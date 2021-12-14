@@ -7,12 +7,12 @@ namespace AdventOfCode2021 {
             var input = FileHelper.ReadFileAsList(path);
 
             Console.WriteLine("Part One");
-            Solve2(input, 10);
+            Solve(input, 10);
             Console.WriteLine("Part Two");
-            Solve2(input, 40);
+            Solve(input, 40);
         }
 
-        private static void Solve2(List<string> input, int steps) {
+        private static void Solve(List<string> input, int steps) {
             Dictionary<string, string> combinations = GetCombinations(input);
             string polymer = input[0];
 
@@ -47,7 +47,8 @@ namespace AdventOfCode2021 {
                 pairs = newPairs.ToDictionary(x => x.Key, x => x.Value);
             }
 
-            Console.WriteLine(characters.Max(x => x.Value) - characters.Min(x => x.Value));
+            Console.WriteLine($"The sum of after {steps} steps is " +
+                $"{characters.Max(x => x.Value) - characters.Min(x => x.Value)}");
         }
 
         private static Dictionary<string, string> GetCombinations(List<string> input) {
