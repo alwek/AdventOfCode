@@ -7,6 +7,7 @@
         public static string ReadFileAsString(string path) => File.ReadAllText(path);
         public static List<string> ReadFileAsList(string path) => File.ReadAllLines(path).ToList();
         public static string[] ReadFileAsArray(string path) => File.ReadAllLines(path);
+        public static int[] ReadFileAsIntArray(string path) => File.ReadAllLines(path).Select(int.Parse).ToArray();
         public static string[,] ReadFileAs2DArray(string path)
         {
             string[] lines = File.ReadAllLines(path);
