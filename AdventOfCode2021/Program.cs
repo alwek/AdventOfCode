@@ -54,6 +54,9 @@ while(int.TryParse(Console.ReadLine(), out int day)) {
         case 16:
             Day16.Run(FileHelper.GetInputPath(day));
             break;
+        case 17:
+            Day17.Run(FileHelper.GetInputPath(day));
+            break;
         case 0:
             //Test.Main(FileHelper.GetInputPath(15));
             break;
