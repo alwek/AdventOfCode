@@ -26,13 +26,11 @@ namespace AdventOfCode2021 {
             Console.WriteLine($"Cubes turned on is {cube.Count(c => c.Value)}");
         }
 
-        private static void PartTwo(List<string> input)
-        {
+        private static void PartTwo(List<string> input) {
             List<Instruction> instructions = ParseInstructions(input);
             List<Instruction> overlaps = new();
 
-            foreach (var b1 in instructions)
-            {
+            foreach (var b1 in instructions) {
                 overlaps.AddRange(
                     overlaps
                         .Select(b2 => Combine(b1, b2))
@@ -69,8 +67,7 @@ namespace AdventOfCode2021 {
         private static List<Instruction> ParseInstructions(List<string> input)
         {
             List<Instruction> instructions = new();
-            foreach (var instruction in input)
-            {
+            foreach (var instruction in input) {
                 bool turnOn = instruction.StartsWith("on");
                 var matches = Regex.Matches(instruction, @"-?\b\d+")
                     .Select(x => int.Parse(x.Value)).ToList();
