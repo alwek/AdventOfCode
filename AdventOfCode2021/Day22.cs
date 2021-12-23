@@ -7,12 +7,12 @@ namespace AdventOfCode2021 {
             List<string> input = FileHelper.ReadFileAsList(path);
 
             Console.WriteLine("Part One");
-            Solve(input, false);
+            PartOne(input, false);
             Console.WriteLine("Part Two");
-            Solve(input, true);
+            PartTwo(input);
         }
 
-        private static void Solve(List<string> input, bool partTwo) {
+        private static void PartOne(List<string> input, bool partTwo) {
             List<Instruction> instructions = ParseInstructions(input);
             Dictionary<(int x, int y, int z), bool> cube = new();
             instructions = !partTwo ? instructions.Where(i => !i.AxisOutsideInitArea).ToList() : instructions;
@@ -26,19 +26,62 @@ namespace AdventOfCode2021 {
             Console.WriteLine($"Cubes turned on is {cube.Count(c => c.Value)}");
         }
 
-        private static List<Instruction> ParseInstructions(List<string> input) {
-            List<Instruction> instructions = new();
+        private static void PartTwo(List<string> input)
+        {
+            List<Instruction> instructions = ParseInstructions(input);
+            List<Instruction> overlaps = new();
 
-            foreach (var instruction in input) {
+            foreach (var b1 in instructions)
+            {
+                overlaps.AddRange(
+                    overlaps
+                        .Select(b2 => Combine(b1, b2))
+                        .Where(b => Overlaps(b))
+                        .ToList());
+
+                if (b1.TurnOn)
+                    overlaps.Add(b1);
+            }
+
+            long sum = overlaps.Sum(b => Volume(b) * (b.TurnOn ? 1 : -1));
+            Console.WriteLine(sum);
+        }
+
+        private static bool Overlaps(Instruction instruction) => 
+            instruction.FromX <= instruction.ToX 
+            && instruction.FromY <= instruction.ToY 
+            && instruction.FromZ <= instruction.ToZ;
+
+        private static long Volume(Instruction instruction) =>
+            (instruction.ToX - instruction.FromX + 1L)
+            * (instruction.ToY - instruction.FromY + 1)
+            * (instruction.ToZ - instruction.FromZ + 1);
+
+        private static Instruction Combine(Instruction first, Instruction second) => 
+            new(!second.TurnOn,
+                Math.Min(first.FromX, second.FromX),
+                Math.Max(first.ToX, second.ToX),
+                Math.Min(first.FromY, second.FromY),
+                Math.Max(first.ToY, second.ToY),
+                Math.Min(first.FromZ, second.FromZ),
+                Math.Max(first.ToZ, second.ToZ));
+
+        private static List<Instruction> ParseInstructions(List<string> input)
+        {
+            List<Instruction> instructions = new();
+            foreach (var instruction in input)
+            {
                 bool turnOn = instruction.StartsWith("on");
-                MatchCollection matches = Regex.Matches(instruction, @"-?\b\d+");
+                var matches = Regex.Matches(instruction, @"-?\b\d+")
+                    .Select(x => int.Parse(x.Value)).ToList();
+
                 instructions.Add(new Instruction(turnOn,
-                    int.Parse(matches[0].Value),
-                    int.Parse(matches[1].Value),
-                    int.Parse(matches[2].Value),
-                    int.Parse(matches[3].Value),
-                    int.Parse(matches[4].Value),
-                    int.Parse(matches[5].Value)));
+                    matches.GetRange(0, 2).Min(),
+                    matches.GetRange(0, 2).Max(),
+                    matches.GetRange(2, 2).Min(),
+                    matches.GetRange(2, 2).Max(),
+                    matches.GetRange(4, 2).Min(),
+                    matches.GetRange(4, 2).Max()));
             }
 
             return instructions;
