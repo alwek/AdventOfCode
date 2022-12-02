@@ -11,8 +11,7 @@
             string[] splitted = input.Split("\n\n");
             List<int> calories = new();
 
-            foreach (var item in splitted)
-            {
+            foreach (var item in splitted) {
                 var calorie = item
                     .Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => int.Parse(x))
