@@ -19,10 +19,10 @@
                 char letter = first
                     .Where(x => second.Contains(x))
                     .FirstOrDefault();
-                count += Char.IsLower(letter) ? letter - 96 : letter - 38;
+                count += char.IsLower(letter) ? letter - 96 : letter - 38;
             }
 
-            Console.WriteLine(count);
+            Console.WriteLine($"Sum of pair values: {count}");
         }
 
         private static void PartTwo(List<string> input) {
@@ -36,10 +36,10 @@
                 char letter = first
                     .Where(x => second.Contains(x) && third.Contains(x))
                     .FirstOrDefault();
-                count += Char.IsLower(letter) ? letter - 96 : letter - 38;
+                count += char.IsLower(letter) ? letter - 96 : letter - 38;
             }
 
-            Console.WriteLine(count);
+            Console.WriteLine($"Sum of common values: {count}");
         }
     }
 }
