@@ -23,6 +23,9 @@ while(int.TryParse(Console.ReadLine(), out int day)) {
         case 6:
             Day6.Run(FileHelper.GetInputPath(day));
             continue;
+        case 7:
+            Day7.Run(FileHelper.GetInputPath(day));
+            continue;
         default:
             Console.WriteLine("Invalid day chosen, somehow..");
             continue;
