@@ -23,11 +23,11 @@
                 for (int step = 0; step < steps; step++) {
                     MoveHead(snake, direction);
 
-                    for (int i = 1; i < snake.Count; i++) {
-                        MoveTail(snake, i);
+                    for (int index = 1; index < snake.Count; index++) {
+                        MoveTail(snake, index);
 
-                        if (i == snake.Count - 1)
-                            matrix[(snake[i].X, snake[i].Y)] = true;
+                        if (index == snake.Count - 1)
+                            matrix[(snake[index].X, snake[index].Y)] = true;
                     }
                 }
             }
