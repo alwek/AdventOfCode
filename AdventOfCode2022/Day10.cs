@@ -46,9 +46,8 @@
             Console.WriteLine($"Signal sum: {signalstrengths.Sum(x => x.Value)}");
 
             for(int i = 0; i < crt.GetLength(0); i++) {
-                for (int j = 0; j < crt.GetLength(1); j++) {
+                for (int j = 0; j < crt.GetLength(1); j++)
                     Console.Write(crt[i, j]);
-                }
                 Console.Write("\n");
             }
         }
