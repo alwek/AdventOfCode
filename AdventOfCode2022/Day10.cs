@@ -10,9 +10,10 @@
         private static void Solve(List<string> input) {
             int register = 1;
             int cycle = 1;
-            var history = new Dictionary<int, int>();
-            var signalstrengths = new List<int>() { 20, 60, 100,  140, 180, 220};
             string[,] crt = new string[6, 40];
+            var signalstrengths = new Dictionary<int, int>() { 
+                { 20, 0 }, { 60, 0 }, { 100, 0 }, { 140, 0 }, { 180, 0 }, { 220, 0 }, 
+            };
 
             foreach (string line in input) {
                 string[] splitted = line.Split(' ');
@@ -23,26 +24,26 @@
                 if (operation == "addx")
                     value = int.Parse(splitted[1]);
 
-                for (int i = cycle; cycle < i + time; cycle++) {
+                for (int start = cycle; cycle < start + time; cycle++) {
                     int row = (cycle - 1) / 40;
-                    int col = (cycle - 1) % 40;
+                    int column = (cycle - 1) % 40;
 
-                    if (register == col || register == (col - 1) || register == (col + 1))
-                        crt[row, col] = "#";
+                    if (register == column || register == (column - 1) || register == (column + 1))
+                        crt[row, column] = "#";
                     else
-                        crt[row, col] = ".";
+                        crt[row, column] = ".";
 
-                    if (signalstrengths.Contains(cycle))
-                        history.Add(cycle, register * cycle);
+                    if (signalstrengths.ContainsKey(cycle))
+                        signalstrengths[cycle] = register * cycle;
 
-                    if (operation == "addx" && cycle == i + time - 1)
+                    if (operation == "addx" && cycle == start + time - 1)
                         register += value;
                 }
             }
 
-            foreach(var item in history)
-                Console.WriteLine($"{item.Key}th cycle: {item.Value}");
-            Console.WriteLine(history.Sum(x => x.Value));
+            foreach(var signal in signalstrengths)
+                Console.WriteLine($"{signal.Key}th cycle: {signal.Value}");
+            Console.WriteLine($"Signal sum: {signalstrengths.Sum(x => x.Value)}");
 
             for(int i = 0; i < crt.GetLength(0); i++) {
                 for (int j = 0; j < crt.GetLength(1); j++) {
