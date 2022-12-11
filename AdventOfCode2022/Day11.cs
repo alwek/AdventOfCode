@@ -49,18 +49,17 @@ namespace AdventOfCode2022 {
 
             foreach (var line in splitted) {
                 string[] parts = line.Split("\n", StringSplitOptions.TrimEntries);
-                long id = long.Parse(Pattern().Match(parts[0]).Value);
-                long divisibleBy = long.Parse(Pattern().Match(parts[3]).Value);
-                long iftrue = long.Parse(Pattern().Match(parts[4]).Value);
-                long iffalse = long.Parse(Pattern().Match(parts[5]).Value);
-                List<long> items = Pattern().Matches(parts[1]).Select(x => long.Parse(x.Value)).ToList();
+                long id = long.Parse(Regex.Match(parts[0], "\\d+").Value);
+                long divisibleBy = long.Parse(Regex.Match(parts[3], "\\d+").Value);
+                long iftrue = long.Parse(Regex.Match(parts[4], "\\d+").Value);
+                long iffalse = long.Parse(Regex.Match(parts[5], "\\d+").Value);
+                List<long> items = Regex.Matches(parts[1], "\\d+").Select(x => long.Parse(x.Value)).ToList();
 
                 var part = parts[2].Split(" ");
                 string ops = part[^2];
                 int opsvalue = int.TryParse(part[^1], out opsvalue) ? opsvalue : 0;
 
-                var monkey = new Monkey(id, divisibleBy, opsvalue, iffalse, iftrue, ops, items);
-                monkeys.Add(monkey);
+                monkeys.Add(new Monkey(id, divisibleBy, opsvalue, iffalse, iftrue, ops, items));
             }
 
             return monkeys;
@@ -70,9 +69,10 @@ namespace AdventOfCode2022 {
             long ThrowToIfTrue, string Ops, List<long> Items) {
             internal long Inspections { get; set; }
             internal bool Test(long value) => value % DivisibleByValue == 0;
-            internal bool SuperTest(long value) => value % value * DivisibleByValue == 0;
             internal long Operation(long value) {
-                long opvalue = OperationValue == 0 ? value : OperationValue;
+                long opvalue = OperationValue == 0 
+                    ? value 
+                    : OperationValue;
 
                 return Ops == "*"
                     ? value * opvalue
@@ -83,8 +83,5 @@ namespace AdventOfCode2022 {
                 : value - opvalue;
             }
         }
-
-        [GeneratedRegex("\\d+")]
-        private static partial Regex Pattern();
     }
 }
