@@ -7,20 +7,41 @@
             Console.WriteLine("Day Twelve");
             List<string> input = FileHelper.ReadFileAsList(path);
 
-            int partOne = Solve(input);
+            int partOne = int.MaxValue;
+            for (int i = 0; i < input.Count; i++)
+                for (int j = 0; j < input[i].Length; j++)
+                    if (input[i][j] == 'S')
+                        partOne = Solve(input, (j, i));
+            Console.WriteLine(partOne);
+
+            int partTwo = int.MaxValue;
+            List<(int x, int y)> list = new();
+            input.ForEach(x => x = x.Replace('S', 'a'));
+            for (int i = 0; i < input.Count; i++)
+                for (int j = 0; j < input[i].Length; j++)
+                    if (input[i][j] == 'a')
+                        list.Add((j, i));
+
+            foreach(var start in list) {
+                int steps = Solve(input, start);
+                partTwo = steps < partTwo ? steps : partTwo;
+            }
+            Console.WriteLine(partTwo);
         }
 
-        private static int Solve(List<string> map)
+        private static int Solve(List<string> map, (int x, int y) startpoint)
         {
-            var start = new Tile();
-            start.Y = map.FindIndex(x => x.Contains("S"));
-            start.X = map[start.Y].IndexOf("S");
+            var start = new Tile {
+                Y = startpoint.y,
+                X = startpoint.x
+            };
             map[start.Y] = map[start.Y].Replace('S', 'a');
 
-            var end = new Tile();
-            end.Y = map.FindIndex(x => x.Contains("E"));
+            var end = new Tile {
+                Y = map.FindIndex(x => x.Contains('E'))
+            };
             end.X = map[end.Y].IndexOf("E");
-            map[end.Y] = map[end.Y].Replace('E', '{');
+            //map[end.Y] = map[end.Y].Replace('E', '{');
 
             start.SetDistance(end.X, end.Y);
 
@@ -28,21 +49,11 @@
             var visited = new List<Tile>();
             active.Add(start);
 
-            int steps = 0;
             while (active.Any()) {
                 var current = active.OrderBy(x => x.CostDistance).First();
 
-                if (current.X == end.X && current.Y == end.Y) { 
-                    while (true) {
-                        steps++;
-                        current = current.Parent;
-
-                        if (current == null) {
-                            Console.WriteLine(steps - 1);
-                            return steps;
-                        }
-                    }
-                }
+                if (current.X == end.X && current.Y == end.Y)
+                    return BacktrackPath(current);
 
                 visited.Add(current);
                 active.Remove(current);
@@ -54,9 +65,9 @@
                         continue;
 
                     if (active.Any(x => x.X == tile.X && x.Y == tile.Y)) {
-                        var existingTile = active.First(x => x.X == tile.X && x.Y == tile.Y);
-                        if (existingTile.CostDistance > current.CostDistance) {
-                            active.Remove(existingTile);
+                        var existing = active.First(x => x.X == tile.X && x.Y == tile.Y);
+                        if (existing.CostDistance > current.CostDistance) {
+                            active.Remove(existing);
                             active.Add(tile);
                         }
                     }
@@ -66,6 +77,17 @@
             }
 
             return int.MaxValue;
+        }
+
+        private static int BacktrackPath(Tile current) {
+            int steps = 0;
+            while (true) {
+                steps++;
+                current = current.Parent;
+
+                if (current == null) 
+                    return steps - 1;
+            }
         }
 
         private static List<Tile> GetWalkableTiles(List<string> map, Tile currentTile, Tile targetTile) {
@@ -84,8 +106,8 @@
                 .Where(tile => tile.X >= 0 && tile.X <= maxX)
                 .Where(tile => tile.Y >= 0 && tile.Y <= maxY)
                 .Where(tile =>
-                    (map[tile.Y][tile.X] == '{' && map[currentTile.Y][currentTile.X] == 'z') ||
-                    map[tile.Y][tile.X] - map[currentTile.Y][currentTile.X] <= 1)
+                    (map[tile.Y][tile.X] == 'E' && map[currentTile.Y][currentTile.X] == 'z') || 
+                    (char.IsLower(map[tile.Y][tile.X]) && map[tile.Y][tile.X] - map[currentTile.Y][currentTile.X] <= 1))
                 .ToList();
         }
     }
