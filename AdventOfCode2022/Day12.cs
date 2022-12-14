@@ -41,7 +41,6 @@
                 Y = map.FindIndex(x => x.Contains('E'))
             };
             end.X = map[end.Y].IndexOf("E");
-            //map[end.Y] = map[end.Y].Replace('E', '{');
 
             start.SetDistance(end.X, end.Y);
 
@@ -58,7 +57,7 @@
                 visited.Add(current);
                 active.Remove(current);
 
-                var walkable = GetWalkableTiles(map, current, end);
+                var walkable = WalkableTiles(map, current, end);
 
                 foreach (var tile in walkable) {
                     if (visited.Any(x => x.X == tile.X && x.Y == tile.Y))
@@ -90,7 +89,7 @@
             }
         }
 
-        private static List<Tile> GetWalkableTiles(List<string> map, Tile currentTile, Tile targetTile) {
+        private static List<Tile> WalkableTiles(List<string> map, Tile currentTile, Tile targetTile) {
             var possibleTiles = new List<Tile>() {
                 new Tile { X = currentTile.X, Y = currentTile.Y - 1, Parent = currentTile, Cost = currentTile.Cost + 1 },
                 new Tile { X = currentTile.X, Y = currentTile.Y + 1, Parent = currentTile, Cost = currentTile.Cost + 1},
