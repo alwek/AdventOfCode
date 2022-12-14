@@ -23,7 +23,7 @@ namespace AdventOfCode2022 {
                     var second = splitted[i + 1].Split(",");
                     int x0 = int.Parse(first[0]), y0 = int.Parse(first[1]);
                     int x1 = int.Parse(second[0]), y1 = int.Parse(second[1]);
-                    points.AddRange(GetPointsOnLine(x0, y0, x1, y1));
+                    points.AddRange(BresenhamLineAlgorithm(x0, y0, x1, y1));
                 }
             }
 
@@ -94,40 +94,29 @@ namespace AdventOfCode2022 {
             }
         }
 
-        // Bresenham's Line Algorithm
-        // http://ericw.ca/notes/bresenhams-line-algorithm-in-csharp.html 
-        public static IEnumerable<Point> GetPointsOnLine(int x0, int y0, int x1, int y1) {
-            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
-            if (steep) {
-                int t = x0;
-                x0 = y0;
-                y0 = t;
-                t = x1;
-                x1 = y1;
-                y1 = t;
-            }
-            if (x0 > x1) {
-                int t = x0;
-                x0 = x1;
-                x1 = t;
-                t = y0;
-                y0 = y1;
-                y1 = t;
-            }
-            int dx = x1 - x0;
+        private static IEnumerable<Point> BresenhamLineAlgorithm(int x0, int y0, int x1, int y1) {
+            int dx = Math.Abs(x1 - x0);
             int dy = Math.Abs(y1 - y0);
-            int error = dx / 2;
-            int ystep = (y0 < y1) ? 1 : -1;
-            int y = y0;
-            for (int x = x0; x <= x1; x++) {
-                yield return new Point((steep ? y : x), (steep ? x : y));
-                error -= dy;
-                if (error < 0) {
-                    y += ystep;
-                    error += dx;
+            int sx = x0 < x1 ? 1 : -1;
+            int sy = y0 < y1 ? 1 : -1;
+            int err = dx - dy;
+
+            while (true) {
+                yield return new Point(x0, y0);
+
+                if (x0 == x1 && y0 == y1)
+                    break;
+
+                int e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
                 }
             }
-            yield break;
         }
     }
 }
