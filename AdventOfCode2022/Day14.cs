@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Runtime.CompilerServices;
-
-namespace AdventOfCode2022 {
+﻿namespace AdventOfCode2022 {
     internal static partial class Day14 {
         public static void Run(string path) {
             Console.WriteLine("Day Fourteen");
@@ -12,9 +9,8 @@ namespace AdventOfCode2022 {
         }
 
         private static void Solve(List<string> input, bool partTwo) {
-            List<Point> points = new();
-            if(partTwo)
-                input.Add("0,166 -> 1000,166");
+            List<(int X, int Y)> points = new();
+            if(partTwo) input.Add("0,166 -> 1000,166"); // specific to my input
 
             foreach (string wall in input) {
                 string[] splitted = wall.Split(" -> ");
@@ -30,26 +26,23 @@ namespace AdventOfCode2022 {
             var minX = points.Min(point => point.X);
             var maxX = points.Max(point => point.X);
             var maxY = points.Max(point => point.Y);
-
             string[,] array = new string[maxY + 1, maxX - minX + 1];
 
             for (int i = 0; i < array.GetLength(0); i++)
                 for (int j = 0; j < array.GetLength(1); j++)
                     array[i, j] = ".";
 
-            foreach(var point in points) 
-                array[point.Y, point.X - minX] = "#";
+            foreach(var (x, y) in points) 
+                array[y, x - minX] = "#";
+            if (!partTwo) Print(array);
 
-            if (!partTwo)
-                Print(array);
-
-            bool flag = true;
             int sands = 0;
-            while (flag) {
-                bool canFall = true;
+            bool spaceAvailable = true;
+            while (spaceAvailable) {
+                bool falling = true;
                 int x = 0, y = 500 - minX;
 
-                while (canFall) {
+                while (falling) {
                     try {
                         if (array[x + 1, y] != "#" && array[x + 1, y] != "o")
                             x++;
@@ -61,40 +54,29 @@ namespace AdventOfCode2022 {
                             x++;
                             y++;
                         }
+                        else if (array[x, y] == "o") {
+                            falling = false;
+                            spaceAvailable = false;
+                        }
                         else {
-                            if (array[x, y] == "o") {
-                                canFall = false;
-                                flag = false;
-                            }
-                            else {
-                                array[x, y] = "o";
-                                sands++;
-                                canFall = false;
-                            }
+                            array[x, y] = "o";
+                            sands++;
+                            falling = false;
                         }
                     }
                     catch (Exception)
                     {
-                        canFall = false;
-                        flag = false;
+                        falling = false;
+                        spaceAvailable = false;
                     }
                 }
             }
 
-            if(!partTwo)
-                Print(array);
+            if(!partTwo) Print(array);
             Console.WriteLine(sands);
         }
 
-        private static void Print(string[,] array) {
-            for (int i = 0; i < array.GetLength(0); i++) {
-                for (int j = 0; j < array.GetLength(1); j++)
-                    Console.Write(array[i, j]);
-                Console.Write("\n");
-            }
-        }
-
-        private static IEnumerable<Point> BresenhamLineAlgorithm(int x0, int y0, int x1, int y1) {
+        private static IEnumerable<(int X, int Y)> BresenhamLineAlgorithm(int x0, int y0, int x1, int y1) {
             int dx = Math.Abs(x1 - x0);
             int dy = Math.Abs(y1 - y0);
             int sx = x0 < x1 ? 1 : -1;
@@ -102,7 +84,7 @@ namespace AdventOfCode2022 {
             int err = dx - dy;
 
             while (true) {
-                yield return new Point(x0, y0);
+                yield return new (x0, y0);
 
                 if (x0 == x1 && y0 == y1)
                     break;
@@ -116,6 +98,14 @@ namespace AdventOfCode2022 {
                     err += dx;
                     y0 += sy;
                 }
+            }
+        }
+
+        private static void Print(string[,] array) {
+            for (int i = 0; i < array.GetLength(0); i++) {
+                for (int j = 0; j < array.GetLength(1); j++)
+                    Console.Write(array[i, j]);
+                Console.Write("\n");
             }
         }
     }
