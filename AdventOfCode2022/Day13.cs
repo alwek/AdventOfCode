@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2022
+﻿using System.Text.Json;
+
+namespace AdventOfCode2022
 {
     internal static partial class Day13
     {
@@ -7,6 +9,9 @@
             Console.WriteLine("Day Thirteen");
             List<string> input = FileHelper.ReadFileAsList(path);
 
+            var first = JsonSerializer.Deserialize<JsonDocument>(input[0]);
+            var second = JsonSerializer.Deserialize<dynamic>(input[1]);
+            
             Solve(input);
         }
 
