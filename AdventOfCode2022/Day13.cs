@@ -15,18 +15,37 @@ namespace AdventOfCode2022
 
         private static void Solve(List<string> input)
         {
+            List<string> ordered = new();
             input = input.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            input.Add("[[6]]");
+            input.Add("[[2]]");
             int indices = 0, index = 1;
 
             for(int i = 0; i < input.Count; i += 2) {
                 JsonElement first = JsonSerializer.Deserialize<JsonElement>(input[i]);
                 JsonElement second = JsonSerializer.Deserialize<JsonElement>(input[i + 1]);
 
-                indices += Compare(first, second) < 0 ? index : 0;
+                if(Compare(first, second) < 0) {
+                    ordered.Add(input[i]);
+                    ordered.Add(input[i + 1]);
+                    indices += index;
+                }
+                else {
+                    ordered.Add(input[i + 1]);
+                    ordered.Add(input[i]);
+                }
+
                 index++;
             }
 
+            ordered.Sort((first, second) => Compare(
+                JsonSerializer.Deserialize<JsonElement>(first), 
+                JsonSerializer.Deserialize<JsonElement>(second)));
+            int firstDivider = ordered.IndexOf("[[2]]") + 1;
+            int secondDivider = ordered.IndexOf("[[6]]") + 1;
+
             Console.WriteLine(indices);
+            Console.WriteLine(firstDivider * secondDivider);
         }
 
         private static int Compare(JsonElement first, JsonElement second) =>
