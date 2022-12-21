@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Security.Cryptography.X509Certificates;
-
-namespace AdventOfCode2022 {
+﻿namespace AdventOfCode2022 {
     internal static partial class Day15 {
         public static void Run(string path) {
             Console.WriteLine("Day Fifteen");
@@ -10,7 +7,7 @@ namespace AdventOfCode2022 {
             Solve(input);
         }
 
-        private static int Rows = 2000000;
+        private static int Rows = 10;//2000000;
 
         private static void Solve(List<string> input) {
             string[] seperator = new string[] { " ", ",", "=", ":" };
@@ -33,7 +30,7 @@ namespace AdventOfCode2022 {
                 points.Add((connection.Bx, connection.By));
             }
 
-            foreach (var connection in connections.Where(x => x.Sy >= Rows))
+            foreach (var connection in connections.Where(x => x.Radius + x.Sy >= Rows && x.Radius - x.Sy <= Rows))
                 foreach ((long x, long y) in connection.PointsInRadius())
                     points.Add((x, y));
 
@@ -42,25 +39,23 @@ namespace AdventOfCode2022 {
         }
 
         internal record BeaconSensor(long Sx, long Sy, long Bx, long By, long Radius) {
-            public List<(long x, long y)> PointsInRadius() {
-                List<(long x, long y)> list = new();
+            public IEnumerable<(long x, long y)> PointsInRadius() {
                 bool peak = false;
                 long i = 0;
 
                 for(long x = Sx - Radius; x < Sx + Radius; x++) {
-                    for (long y = Sy - i; y < Sy + i; y++) 
-                        list.Add((x, y));
+                    for (long y = Sy - i; y < Sy + i; y++)
+                        if (y == Rows)
+                            yield return (x, y);
 
-                    if(i == Radius) 
+                    if (i == Radius)
                         peak = true;
 
-                    if (peak) 
+                    if (peak)
                         i--;
                     else
                         i++;
                 }
-
-                return list;
             }
         }
     }
