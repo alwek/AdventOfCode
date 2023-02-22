@@ -7,14 +7,14 @@
             Solve(input);
         }
 
-        private static int Rows = 10;//2000000;
+        private static readonly int Row = 2000000;
 
         private static void Solve(List<string> input) {
             string[] seperator = new string[] { " ", ",", "=", ":" };
-            List<BeaconSensor> connections = new();
+            Dictionary<((long, long), (long, long)), long> beaconsensors = new();
             List<(long x, long y)> points = new();
 
-            foreach(string line in input) {
+            foreach (string line in input) {
                 string[] splitted = line.Split(seperator, StringSplitOptions.RemoveEmptyEntries);
                 long sx = long.Parse(splitted[3]);
                 long sy = long.Parse(splitted[5]);
@@ -22,40 +22,45 @@
                 long by = long.Parse(splitted[13]);
                 long radius = Math.Abs(sx - bx) + Math.Abs(sy - by);
 
-                connections.Add(new(sx, sy, bx, by, radius));
+                beaconsensors.Add(((sx, sy), (bx, by)), radius);
             }
 
-            foreach (var connection in connections) {
-                points.Add((connection.Sx, connection.Sy));
-                points.Add((connection.Bx, connection.By));
+            foreach (var bs in beaconsensors) {
+                points.Add(bs.Key.Item1);
+                points.AddRange(PointsInRow(bs.Key.Item1, bs.Value));
+                points.Remove(bs.Key.Item2);
             }
 
-            foreach (var connection in connections.Where(x => x.Radius + x.Sy >= Rows && x.Radius - x.Sy <= Rows))
-                foreach ((long x, long y) in connection.PointsInRadius())
-                    points.Add((x, y));
-
-            var positions = points.Where(point => point.y == Rows).Distinct().Count();
+            var positions = points.Where(point => point.y == Row).Distinct().Count();
             Console.WriteLine(positions);
         }
 
-        internal record BeaconSensor(long Sx, long Sy, long Bx, long By, long Radius) {
-            public IEnumerable<(long x, long y)> PointsInRadius() {
-                bool peak = false;
-                long i = 0;
+        private static IEnumerable<(long x, long y)> PointsInRow((long x, long y) point, long radius) {
+            long distance = point.y < Row ? Row - point.y : point.y - Row;
+            long peak = radius - distance;
+            List<(long x, long y)> points = new();
 
-                for(long x = Sx - Radius; x < Sx + Radius; x++) {
-                    for (long y = Sy - i; y < Sy + i; y++)
-                        if (y == Rows)
-                            yield return (x, y);
+            for (long i = point.x - peak; i < point.x + peak + 1; i++)
+                points.Add((i, Row));
 
-                    if (i == Radius)
-                        peak = true;
+            return points;
+        }
 
-                    if (peak)
-                        i--;
-                    else
-                        i++;
-                }
+        private static IEnumerable<(long x, long y)> PointsInRadius((long x, long y) point, long radius) {
+            bool peak = false;
+            long i = 0;
+
+            for (long x = point.x - radius; x < point.x + radius; x++) {
+                for (long y = point.y - i; y < point.y + i; y++)
+                    yield return (x, y);
+
+                if (i == radius)
+                    peak = true;
+
+                if (peak)
+                    i--;
+                else
+                    i++;
             }
         }
     }
