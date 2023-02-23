@@ -1,78 +1,90 @@
 ﻿namespace AdventOfCode2022 {
     internal static partial class Day16 {
-        private static int moves = 30;
-        private static int pressure = 0;
-
         public static void Run(string path) {
             Console.WriteLine("Day Sixteen");
             List<string> input = FileHelper.ReadFileAsList(path);
-
+            
             Solve(input);
         }
 
-        private static void Solve(List<string> input) {
-            List<Valve> valves = new();
-            Dictionary<string, string[]> neighbours = new();
+        private static void Solve(List<string> input)
+        {
             string[] seperator = new string[] { " ", "=", ";", "," };
+            WeightedGraph<string> graph = new(input.Count);
+            Dictionary<string, int> indices = Indices(input);
 
-            foreach (string line in input) {
-                string[] splitted = line.Split(seperator, StringSplitOptions.RemoveEmptyEntries);
+            for(int i = 0; i < input.Count; i++) {
+                string[] splitted = input[i].Split(seperator, StringSplitOptions.RemoveEmptyEntries);
                 string name = splitted[1];
                 int flowrate = int.Parse(splitted[5]);
-                string[] tunnels = new string[] { splitted[^1], splitted[^2], splitted[^3] };
 
-                valves.Add(new Valve(name, flowrate, new List<Valve>()));
-                neighbours.Add(name, tunnels);
+                graph.AddVertex(i, name, flowrate);
+
+                for(int j = 10; j < splitted.Length; j++)
+                    graph.AddEdge(i, indices[splitted[j]], 1);
             }
 
-            foreach(var neighbour in neighbours) {
-                var valve = valves.First(x => x.Name == neighbour.Key);
-                var tunnels = valves.Where(x => neighbour.Value.Contains(x.Name)).ToList();
-                valve.Tunnels.AddRange(tunnels);
-            }
-
-            DFS(valves.First());
-            Console.WriteLine(pressure);
+            graph.PrintGraph();
         }
 
-        internal static void DFS(Valve startNode) {
-            // Mark the start node as visited
-            startNode.Visited = true;
+        private static Dictionary<string, int> Indices(List<string> input)
+        {
+            Dictionary<string, int> indices = new();
 
-            moves--;
-            if (moves <= 0)
-                return;
-
-            // Open the start node's valve
-            OpenValve(startNode);
-
-            // Recursively visit all of the start node's neighbors
-            foreach (Valve neighbor in startNode.Tunnels)
-                if (!neighbor.Visited)
-                    DFS(neighbor);
-
-        }
-
-        internal static void OpenValve(Valve valve) {
-            // Open the valve and release pressure according to its flow rate
-            // Update a total pressure released counter
-            if(valve.FlowRate > 0) {
-                moves--;
-                pressure += valve.FlowRate * moves;
+            for(int i = 0; i < input.Count; i++)
+            {
+                string[] splitted = input[i].Split(' ');
+                indices.Add(splitted[1], i);
             }
+
+            return indices;
         }
     }
 
-    internal class Valve {
-        public string Name { get; set; }
-        public int FlowRate { get; set; }
-        public bool Visited { get; set; }
-        public List<Valve> Tunnels { get; set; }
+    internal class Vertex<T>
+    {
+        public T Value { get; set; }
+        public int Flowrate { get; set; }
+        public bool Opened { get; set; }
 
-        public Valve(string name, int flowRate, List<Valve> tunnels) {
-            Name = name;
-            FlowRate = flowRate;
-            Tunnels = tunnels;
+        public Vertex(T value, int flowrate)
+        {
+            Value = value;
+            Flowrate = flowrate;
+            Opened = false;
+        }
+    }
+
+    internal class WeightedGraph<T>
+    {
+        public readonly int Count;
+        public readonly List<(int, int)>[] Adjacents;
+        public readonly Vertex<T>[] Vertices;
+
+        public WeightedGraph(int count) {
+            Count = count;
+            Adjacents = new List<(int, int)>[Count];
+            Vertices = new Vertex<T>[Count];
+
+            for (int i = 0; i < Count; i++)
+                Adjacents[i] = new List<(int, int)>();
+        }
+
+        public void AddVertex(int index, T value, int flowrate) => 
+            Vertices[index] = new Vertex<T>(value, flowrate);
+
+        public void AddEdge(int u, int v, int weight) => 
+            Adjacents[u].Add((v, weight));
+
+        public void PrintGraph() {
+            for (int i = 0; i < Count; i++) {
+                Console.Write("Vertex " + i + " (" + Vertices[i].Value + "): ");
+
+                foreach ((int, int) edge in Adjacents[i])
+                    Console.Write("(" + Vertices[edge.Item1].Value + ", " + edge.Item2 + ") ");
+
+                Console.WriteLine();
+            }
         }
     }
 }
