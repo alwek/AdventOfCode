@@ -30,27 +30,26 @@
 
             foreach (var bs in beaconsensors) {
                 points.Add(bs.Key.Item1);
-                points.AddRange(PointsInRow(bs.Key.Item1, bs.Value));
+                points.AddRange(PointsOnRow(bs.Key.Item1, bs.Value));
                 points.Remove(bs.Key.Item2);
 
-                perimeter.AddRange(PointsInRadius(bs.Key.Item1, bs.Value));
+                perimeter.AddRange(PointsOnPerimeter(bs.Key.Item1, bs.Value));
             }
 
-            foreach(var bs in beaconsensors) {
-                (long x, long y) sensor = bs.Key.Item1;
-                var c1 = (sensor.x - bs.Value, sensor.y);
-                var c2 = (sensor.x + bs.Value, sensor.y);
-                var c3 = (sensor.x, sensor.y - bs.Value);
-                var c4 = (sensor.x, sensor.y + bs.Value);
+            perimeter = perimeter.Where(IsWithinBoundries).Distinct().Order().ToList();
 
-                available.AddRange(perimeter.Where(point => !IsPositionInsideRectangle(c1, c2, c3, c4, point) && IsWithinBoundries(point)));
+            foreach(var pt in perimeter)
+            {
+                if (beaconsensors.All(bs => !IsWithinRadius(pt, bs.Key.Item1, bs.Value)))
+                    available.Add(pt);
             }
 
             var positions = points.Where(point => point.y == Row).Distinct().Count();
-             Console.WriteLine(positions);
+            Console.WriteLine(positions);
+            Console.WriteLine(available.First().x * 4000000 + available.First().y);
         }
 
-        private static IEnumerable<(long x, long y)> PointsInRow((long x, long y) point, long radius) {
+        private static IEnumerable<(long x, long y)> PointsOnRow((long x, long y) point, long radius) {
             long distance = point.y < Row ? Row - point.y : point.y - Row;
             long peak = radius - distance;
             List<(long x, long y)> points = new();
@@ -61,7 +60,7 @@
             return points;
         }
 
-        private static IEnumerable<(long x, long y)> PointsInRadius((long x, long y) point, long radius) {
+        private static IEnumerable<(long x, long y)> PointsOnPerimeter((long x, long y) point, long radius) {
             (long j1, long j2, long j3, long j4) = (point.y, point.y + radius + 1, point.y, point.y - radius - 1);
 
             for (long i = point.x - radius - 1; i <= point.x + radius + 1; i++) {
@@ -82,21 +81,39 @@
             }
         }
 
-        private static bool IsPositionInsideRectangle(
-            (long x, long y) c1, 
-            (long x, long y) c2, 
-            (long x, long y) c3, 
-            (long x, long y) c4, 
-            (long x, long y) c5) {
+        private static IEnumerable<(long x, long y)> PointsOnBorder((long x, long y) point, long radius)
+        {
+            (long j1, long j2, long j3, long j4) = (point.y, point.y + radius, point.y, point.y - radius);
 
-            if (c5.x >= Math.Min(c1.x, c4.x) && c5.x <= Math.Max(c2.x, c3.x)) 
-                if (c5.y >= Math.Min(c1.y, c2.y) && c5.y <= Math.Max(c3.y, c4.y)) 
-                    return true;
-
-            return false;
+            for (long i = point.x - radius; i <= point.x + radius; i++)
+            {
+                if (i < point.x)
+                {
+                    yield return (i, j1++);
+                    yield return (i, j3--);
+                }
+                else if (i > point.x)
+                {
+                    yield return (i, j2--);
+                    yield return (i, j4++);
+                }
+                else
+                {
+                    yield return (i, j1++);
+                    yield return (i, j3--);
+                    yield return (i, j2--);
+                    yield return (i, j4++);
+                }
+            }
         }
 
         private static bool IsWithinBoundries((long x, long y) point) => 
-            point.x >= 0 && point.x <= Max && point.y >= 0 && point.y <= 20;
+            point.x >= 0 && point.x <= Max && point.y >= 0 && point.y <= Max;
+
+        private static bool IsWithinRadius((long x, long y) point, (long x, long y) center, long radius)
+        {
+            long distance = Math.Abs(point.x - center.x) + Math.Abs(point.y - center.y);
+            return distance <= radius;
+        }
     }
 }
