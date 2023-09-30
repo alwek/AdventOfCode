@@ -44,5 +44,6 @@ int main(){
     printf("Top calories: %d\n", top[0] + top[1] + top[2]);
 
     fclose(input);
+    
     return 0;
 }

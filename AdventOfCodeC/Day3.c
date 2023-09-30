@@ -60,6 +60,7 @@ int main(){
     FILE *input = fopen("../input/2022/test.txt", "r");
 
     solve(input);
+    fclose(input);
     
     return 0;
 }
